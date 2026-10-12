@@ -4,11 +4,9 @@
 ## 模型
 输入一张带噪图，需要输出一份均值和一份方差，从而确定上一次加噪的比例以及叠加高斯函数时的方差，只要知道了这两个就能进行去噪，还原上一步
 
-$$
-p_\theta(x_{t-1}\mid x_t)
-=
-\mathcal N\!\left(\mu_\theta(x_t,t),\Sigma_\theta(x_t,t)\right)
-$$
+```math
+p_\theta(x_{t-1}\mid x_t)=\mathcal N\!\left(\mu_\theta(x_t,t),\Sigma_\theta(x_t,t)\right)
+```
 
 ## 损失函数
 我们首先要给一条 0 ~ T 的采样轨迹算轨迹权重，对于不同的轨迹，在估计图片密度时的贡献不同。用 p 把 q 除掉可以得到权重 W，这样在对同一张 x0 的多条轨迹取平均时，随机的前向概率 q 不会干扰模型的反向生成。
@@ -43,9 +41,9 @@ $$
 LOSS FUNCTION 为对数似然函数：$L=\int q(x_0)\log p_\theta(x_0)\,dx_0$，不过实际使用的时候，因为我们没法求连续分布，因此只能对数据集加权求和，用 $L\approx\frac1N\sum_{i=1}^{N}\log p_\theta\!\left(x_0^{[i]}\right)$ 的离散情况来近似
 模型的网络上面已经描述过，它输入一张带噪图，输出“上一步图片”的高斯分布参数，因此把中间部分按权重 W 取平均后全部消掉，最终的损失函数可以写成：
 
-$$
-L=\mathbb E_{x_0\sim q}\left[\log\mathbb E_{q(x_{1:T}\mid x_0)}[W_\theta]\right]\tag{11}
-$$
+```math
+L=\mathbb E_{x_0\sim q}\left[\log\mathbb E_{q(x_{1:T}\mid x_0)}[W_\theta]\right]\qquad\text{(11)}
+```
 
 其中：
 
@@ -63,9 +61,9 @@ $$
 
 把期望写成积分形式，进行二重积分运算，化简得到：
 
-$$
-L\ge\mathbb E_{q(x_{0:T})}[\log W_\theta]=K\tag{12–13}
-$$
+```math
+L\ge\mathbb E_{q(x_{0:T})}[\log W_\theta]=K\qquad\text{(12–13)}
+```
 
 展开 W 得到：
 
