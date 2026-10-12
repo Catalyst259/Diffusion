@@ -5,11 +5,9 @@
 输入一张带噪图，需要输出一份均值和一份方差，从而确定上一次加噪的比例以及叠加高斯函数时的方差，只要知道了这两个就能进行去噪，还原上一步
 
 $$
-\[
 p_\theta(x_{t-1}\mid x_t)
 =
 \mathcal N\!\left(\mu_\theta(x_t,t),\Sigma_\theta(x_t,t)\right)
-\]
 $$
 
 ## 损失函数
@@ -19,40 +17,40 @@ $$
 
 | 符号 | 含义 |
 |---|---|
-| $\(q(x_0)\)$ | 真实数据分布在这整张图片处的概率密度，是一个标量 |
-| $\(q(x_t\mid x_{t-1})\)$ | 给定上一步图片，按人为规定的加噪规则，下一步会得到什么的分布 |
-| $\(p(x_T)\)$ | 生成的起点，通常是事先指定的标准高斯噪声分布 |
-| $\(p_\theta(x_{t-1}\mid x_t)\)$ | 给定当前带噪图，模型预测上一步图片的分布，**这是网络主要学习的东西** |
-| $\(p_\theta(x_0)\)$ | 整条反向生成链最终产生的图片分布，希望它接近真实分布 $\(q(x_0)\)$ |
+| $q(x_0)$ | 真实数据分布在这整张图片处的概率密度，是一个标量 |
+| $q(x_t\mid x_{t-1})$ | 给定上一步图片，按人为规定的加噪规则，下一步会得到什么的分布 |
+| $p(x_T)$ | 生成的起点，通常是事先指定的标准高斯噪声分布 |
+| $p_\theta(x_{t-1}\mid x_t)$ | 给定当前带噪图，模型预测上一步图片的分布，**这是网络主要学习的东西** |
+| $p_\theta(x_0)$ | 整条反向生成链最终产生的图片分布，希望它接近真实分布 $q(x_0)$ |
 
 | 数学表达 | 代码含义 |
 |---|---|
-| $\(q(\,\cdot\mid x_{t-1})\)$ | `q_step`：一个条件分布对象 |
-| $\(x_t\sim q(\,\cdot\mid x_{t-1})\)$ | `q_step.sample()`：生成图片张量 |
-| $\(\log q(x_t\mid x_{t-1})\)$ | `q_step.log_prob(x_t)`：计算一个标量 |
+| $q(\,\cdot\mid x_{t-1})$ | `q_step`：一个条件分布对象 |
+| $x_t\sim q(\,\cdot\mid x_{t-1})$ | `q_step.sample()`：生成图片张量 |
+| $\log q(x_t\mid x_{t-1})$ | `q_step.log_prob(x_t)`：计算一个标量 |
 
 知道了这些，接下来我们一步步化简
 首先，前向与反向两条链在某一时刻的联合分布可以写成累乘形式：
 
 $$
-\[q(x_{0:T})=q(x_0)\prod_{t=1}^{T}q(x_t\mid x_{t-1})\]
+q(x_{0:T})=q(x_0)\prod_{t=1}^{T}q(x_t\mid x_{t-1})
 $$
 
 $$
-\[p(x_{0:T})=p(x_T)\prod_{t=1}^{T}p(x_{t-1}\mid x_t)\]
+p(x_{0:T})=p(x_T)\prod_{t=1}^{T}p(x_{t-1}\mid x_t)
 $$
 
-LOSS FUNCTION 为对数似然函数：$\[L=\int q(x_0)\log p_\theta(x_0)\,dx_0\]$，不过实际使用的时候，因为我们没法求连续分布，因此只能对数据集加权求和，用 $\[L\approx\frac1N\sum_{i=1}^{N}\log p_\theta\!\left(x_0^{[i]}\right)\]$ 的离散情况来近似
+LOSS FUNCTION 为对数似然函数：$L=\int q(x_0)\log p_\theta(x_0)\,dx_0$，不过实际使用的时候，因为我们没法求连续分布，因此只能对数据集加权求和，用 $L\approx\frac1N\sum_{i=1}^{N}\log p_\theta\!\left(x_0^{[i]}\right)$ 的离散情况来近似
 模型的网络上面已经描述过，它输入一张带噪图，输出“上一步图片”的高斯分布参数，因此把中间部分按权重 W 取平均后全部消掉，最终的损失函数可以写成：
 
 $$
-\[L=\mathbb E_{x_0\sim q}\left[\log\mathbb E_{q(x_{1:T}\mid x_0)}[W_\theta]\right]\tag{11}\]
+L=\mathbb E_{x_0\sim q}\left[\log\mathbb E_{q(x_{1:T}\mid x_0)}[W_\theta]\right]\tag{11}
 $$
 
 其中：
 
 $$
-\[W_\theta=p(x_T)\prod_{t=1}^{T}\frac{p_\theta(x_{t-1}\mid x_t)}{q(x_t\mid x_{t-1})}\]
+W_\theta=p(x_T)\prod_{t=1}^{T}\frac{p_\theta(x_{t-1}\mid x_t)}{q(x_t\mid x_{t-1})}
 $$
 
 在内层，先对一张图片的不同加噪轨迹做加权平均，得到 W，并对不同加噪轨迹 q 的平均结果求 log
@@ -60,26 +58,27 @@ $$
 对于内层期望，我们希望能利用詹森不等式将期望运算提出
 
 $$
-\[L\ge\mathbb E_{q(x_0)}\mathbb E_{q(x_{1:T}\mid x_0)}[\log W_\theta]\]
+L\ge\mathbb E_{q(x_0)}\mathbb E_{q(x_{1:T}\mid x_0)}[\log W_\theta]
 $$
 
 把期望写成积分形式，进行二重积分运算，化简得到：
 
 $$
-\[L\ge\mathbb E_{q(x_{0:T})}[\log W_\theta]=K\tag{12–13}\]
+L\ge\mathbb E_{q(x_{0:T})}[\log W_\theta]=K\tag{12–13}
 $$
 
 展开 W 得到：
 
 $$
-\[K=\mathbb E_q\left[\log p(x_T)+\sum_{t=1}^{T}\left(\log p_\theta(x_{t-1}\mid x_t)-\log q(x_t\mid x_{t-1})\right)\right]\]
+K=\mathbb E_q\left[\log p(x_T)+\sum_{t=1}^{T}\left(\log p_\theta(x_{t-1}\mid x_t)-\log q(x_t\mid x_{t-1})\right)\right]
 $$
 
 这里可以直接化简成论文里的 KL 散度 + 三个熵项的公式，其中熵项为常量，核心优化目标就是 KL 散度部分 （KL 散度是很常用的概率分布损失函数）
 
 $$
-\[\mathcal L_{\text{train}}(\theta)=-K=\sum_{t=2}^{T}\mathbb E_{q(x_0,x_t)}\left[D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\,\middle\|\,p_\theta(x_{t-1}\mid x_t)\right)\right]+C\]
+\mathcal L_{\text{train}}(\theta)=-K=\sum_{t=2}^{T}\mathbb E_{q(x_0,x_t)}\left[D_{\mathrm{KL}}\!\left(q(x_{t-1}\mid x_t,x_0)\,\middle\|\,p_\theta(x_{t-1}\mid x_t)\right)\right]+C
 $$
+
 训练过程如下：
 ```
 从训练集拿 x0
