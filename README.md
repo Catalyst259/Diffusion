@@ -1,0 +1,2 @@
+# Exploration on Diffusion Models
+This repository contains my personal notes and explorations on diffusion models, a class of generative models that have gained significant attention in recent years. The notes are based on various research papers, tutorials, and my own experiments.
