@@ -1,0 +1,37 @@
+name: ml-practice
+
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - python=3.12
+  - pip
+
+  # Numerical computing and traditional machine learning.
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+
+  # Keep CPU BLAS on pthreads OpenBLAS to avoid PyTorch's OpenMP runtime conflict.
+  - "libblas=*=*openblas"
+  - "libcblas=*=*openblas"
+  - "liblapack=*=*openblas"
+  - "libopenblas=*=*pthreads*"
+
+  # Notebooks and training utilities.
+  - jupyterlab
+  - ipykernel
+  - tqdm
+
+  # Windows image/plotting wheels avoid the Conda Pillow / torchvision JPEG DLL conflict.
+  - pip:
+      - "--index-url https://pypi.tuna.tsinghua.edu.cn/simple"
+      - "--extra-index-url https://mirror.sjtu.edu.cn/pytorch-wheels/cu128/"
+      - "pillow==12.3.0"
+      - "matplotlib==3.11.2"
+      - "seaborn==0.13.2"
+      - "tensorboard==2.21.0"
+      - "torch==2.11.0+cu128"
+      - "torchvision==0.26.0+cu128"

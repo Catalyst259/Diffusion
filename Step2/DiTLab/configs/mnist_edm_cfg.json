@@ -1,0 +1,53 @@
+{
+  "model": {
+    "name": "dit",
+    "options": {
+      "patch_size": 4,
+      "hidden_size": 192,
+      "depth": 4,
+      "num_heads": 6
+    }
+  },
+  "algorithm": {
+    "name": "edm",
+    "options": {
+      "sigma_data": 0.5,
+      "p_mean": 0.0,
+      "p_std": 1.2,
+      "label_dropout": 0.1
+    }
+  },
+  "sampler": {
+    "name": "edm",
+    "options": {
+      "sigma_data": 0.5,
+      "num_steps": 32,
+      "sigma_min": 0.002,
+      "sigma_max": 80.0,
+      "rho": 7.0,
+      "cfg_scale": 2.0
+    }
+  },
+  "dataset": {
+    "name": "mnist",
+    "options": {
+      "root": "../data",
+      "download": false
+    }
+  },
+  "training": {
+    "epochs": 5,
+    "batch_size": 64,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0,
+    "max_grad_norm": 2.0,
+    "preview_every": 500,
+    "save_every": 500,
+    "preview_count": 10,
+    "log_every": 50,
+    "num_workers": 0,
+    "seed": 42,
+    "device": "cuda",
+    "output_dir": "DiTLab/outputs/edm_cfg_balanced"
+  }
+}

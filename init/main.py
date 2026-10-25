@@ -1,6 +1,5 @@
 from pathlib import Path
 import math
-from math import sqrt
 import torch
 from torch import nn
 from PIL import Image

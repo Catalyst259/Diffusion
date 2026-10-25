@@ -1,2 +1,71 @@
+# Python bytecode, environments, and build artifacts
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.conda/
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Notebook, lint, and test caches
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Editors, OS files, and local configuration
 .vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.tmp
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Datasets, training runs, checkpoints, and generated samples
+data/
+datasets/
+outputs/
+results/
+runs/
+wandb/
+tensorboard/
+checkpoints/
+pretrained_models/
+samples/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.log
+events.out.tfevents.*
+denoised_output.png
+/Step2/DiT/official/sample.png
+
+# Keep handwritten notes and the documented preview script inside UNet outputs.
+!/Step2/UNet/outputs/
+/Step2/UNet/outputs/*
+!/Step2/UNet/outputs/Turn1/
+/Step2/UNet/outputs/Turn1/*
+!/Step2/UNet/outputs/Turn1/Record.md
+!/Step2/UNet/outputs/Turn3_CFG/
+/Step2/UNet/outputs/Turn3_CFG/*
+!/Step2/UNet/outputs/Turn3_CFG/verify_preview.py
+
+# Machine-specific installation diagnostics and verification output
+/Step1/Review/conda-diagnostics/
+/Step1/Review/gpu-smoke-artifacts/
+/Step1/Review/gpu-smoke-result.json
